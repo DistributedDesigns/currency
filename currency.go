@@ -56,9 +56,12 @@ func (c Currency) ToFloat() float64 {
 
 // FitsInto : Finds whole number of divisions of two currencies, with remainder. If either argument is zero then (0, $0.00) is returned
 func (c *Currency) FitsInto(total Currency) (uint, Currency) {
-	// Guard against div by zero in times
-	if c.cents == 0 || total.cents == 0 {
+	if c.cents == 0 {
+		// Guard against div by zero in times
 		return 0, Currency{}
+	} else if total.cents == 0 {
+		// X % 0 = 0 but we want X % 0 = X
+		return 0, Currency{c.cents}
 	}
 
 	times := total.cents / c.cents

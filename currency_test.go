@@ -94,8 +94,8 @@ func TestFitsInto(t *testing.T) {
 		// $0 fits into $10: 0 times with $0 remainder
 		testPair{zeroD, tenD}: expectedPair{0, zeroD},
 
-		// $10 fits into $0: 0 times with $0 remainder
-		testPair{tenD, zeroD}: expectedPair{0, zeroD},
+		// $10 fits into $0: 0 times with $10 remainder
+		testPair{tenD, zeroD}: expectedPair{0, tenD},
 
 		// $3.33 fits into $10: 3 times with $0.01 remainder
 		testPair{Currency{333}, tenD}: expectedPair{3, Currency{1}},
