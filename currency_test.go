@@ -43,6 +43,8 @@ func TestNewFromString(t *testing.T) {
 
 	unparseableStrings := []string{
 		"abcd",
+		"-1",
+		"",
 	}
 	for _, s := range unparseableStrings {
 		if _, err := NewFromString(s); err == nil {
@@ -117,16 +119,16 @@ func TestAdd(t *testing.T) {
 		testPair{Currency{150}, Currency{275}}: Currency{425},
 
 		// $0.00 + $1.00 = $1.00
-		testPair{Currency{0}, oneD}: oneD,
+		testPair{zeroD, oneD}: oneD,
 
 		// $1.00 + $0.00 = $1.00
-		testPair{Currency{100}, zeroD}: oneD,
+		testPair{oneD, zeroD}: oneD,
 	}
 
 	for tp, e := range tests {
-		tp.c1.Add(tp.c2)
-		if tp.c1.String() != e.String() {
-			t.Errorf("Expected %s got %s", e.String(), tp.c1.String())
+		c3 := tp.c1.Add(tp.c2)
+		if c3.String() != e.String() {
+			t.Errorf("Expected %s got %s", e.String(), c3.String())
 		}
 	}
 }
@@ -137,23 +139,22 @@ func TestSub(t *testing.T) {
 		testPair{Currency{425}, Currency{150}}: Currency{275},
 
 		// $1.00 - $0.00 = $1.00
-		testPair{Currency{100}, zeroD}: oneD,
+		testPair{oneD, zeroD}: oneD,
 
 		// $1.00 - $1.00 = $0.00
-		testPair{Currency{100}, oneD}: zeroD,
+		testPair{oneD, oneD}: zeroD,
 	}
 
 	for tp, e := range tests {
-		tp.c1.Sub(tp.c2)
-		if tp.c1.String() != e.String() {
-			t.Errorf("Expected %s got %s", e.String(), tp.c1.String())
+		c3, _ := tp.c1.Sub(tp.c2)
+		if c3.String() != e.String() {
+			t.Errorf("Expected %s got %s", e.String(), c3.String())
 		}
 	}
 
 	// Make sure we can't get a negative balance
-	// $5.00 - $10.00 = << error >>
-	five, _ := NewFromFloat(5)
-	err := five.Sub(tenD)
+	// $1.00 - $10.00 = << error >>
+	_, err := oneD.Sub(tenD)
 	if err == nil {
 		t.Error("Should not subtract more than balance")
 	}
@@ -170,31 +171,30 @@ func TestMul(t *testing.T) {
 		mulPair{Currency{125}, 5}: Currency{625},
 
 		// $1.00 * 0 = $0.00
-		mulPair{Currency{100}, 0}: zeroD,
+		mulPair{oneD, 0}: zeroD,
 
 		// $1.00 * 3.456 = $3.46
-		mulPair{Currency{100}, 3.456}: Currency{346},
+		mulPair{oneD, 3.456}: Currency{346},
 
 		// $10.00 * 0.1 = $1.00
-		mulPair{Currency{1000}, 0.1}: oneD,
+		mulPair{tenD, 0.1}: oneD,
 
 		// $10.00 * 0.499999 = $5.00
-		mulPair{Currency{1000}, 0.499999}: Currency{500},
+		mulPair{tenD, 0.499999}: Currency{500},
 
 		// $10.00 * (2/3) = $6.67
-		mulPair{Currency{1000}, 2.0 / 3.0}: Currency{667},
+		mulPair{tenD, 2.0 / 3.0}: Currency{667},
 	}
 
 	for mp, e := range tests {
-		mp.c.Mul(mp.f)
-		if mp.c.String() != e.String() {
-			t.Errorf("Expected %s got %s", e.String(), mp.c.String())
+		c3, _ := mp.c.Mul(mp.f)
+		if c3.String() != e.String() {
+			t.Errorf("Expected %s got %s", e.String(), c3.String())
 		}
 	}
 
 	// Negative multiplication should not be allowed
-	five, _ := NewFromFloat(5)
-	err := five.Mul(-1)
+	_, err := oneD.Mul(-1)
 	if err == nil {
 		t.Error("Should not multiply by negative numbers")
 	}
