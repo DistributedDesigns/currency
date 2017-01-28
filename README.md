@@ -23,9 +23,9 @@ _, err := NewFromString("abcd") // err != nil
 // Basic operations are available
 payment := NewFromString("10")
 balance := NewFromString("100")
-balance.Add(payment)          // balance: $110.00
-balance.Sub(Currency{2500})   // balance:  $85.00
-balance.Mul(0.1)              // balance:   $8.50
+
+taxes := payment.Mul(0.07) // $0.70
+balance = balance.Add(payment.Sub(taxes)) // $109.30
 
 // There are convenience mod and remainder functions
 stockPrice := NewFromFloat(3.33)

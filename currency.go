@@ -71,31 +71,29 @@ func (c *Currency) FitsInto(total Currency) (uint, Currency) {
 }
 
 // Add : Increase the value of a Currency
-func (c *Currency) Add(c2 Currency) {
-	c.cents += c2.cents
+func (c *Currency) Add(c2 Currency) Currency {
+	return Currency{c.cents + c2.cents}
 }
 
 // Sub : Decrease the value of a currency
-func (c *Currency) Sub(c2 Currency) error {
+func (c *Currency) Sub(c2 Currency) (Currency, error) {
 	if c2.cents > c.cents {
-		return errors.New("Cannot create negative currency")
+		return Currency{}, errors.New("Cannot create negative currency")
 	}
 
-	c.cents -= c2.cents
-
-	return nil
+	return Currency{c.cents - c2.cents}, nil
 }
 
 // Mul : Scales the value of a currency
-func (c *Currency) Mul(f float64) error {
+func (c *Currency) Mul(f float64) (Currency, error) {
 	if f < 0 {
-		return errors.New("Cannot multiply by negative numbers")
+		return Currency{}, errors.New("Cannot multiply by negative numbers")
 	}
 
 	scaledCents := float64(c.cents) * f
 
 	// Do the shift / cast rounding trick again
-	c.cents = uint(scaledCents + 0.5)
+	roundedCents := uint(scaledCents + 0.5)
 
-	return nil
+	return Currency{roundedCents}, nil
 }
