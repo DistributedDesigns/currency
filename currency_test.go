@@ -85,20 +85,20 @@ var (
 
 func TestFitsInto(t *testing.T) {
 	tests := map[testPair]expectedPair{
-		// $30 fits into $100: 3 times with $10 remainder
-		testPair{thirtyD, hundredD}: expectedPair{3, tenD},
+		// $2.75 fits into $10: 3 times at $8.25
+		testPair{Currency{275}, tenD}: expectedPair{3, Currency{825}},
 
-		// $100 fits into $30: 0 times with $30 remainder
-		testPair{hundredD, thirtyD}: expectedPair{0, thirtyD},
+		// $100 fits into $30: 0 times at $0
+		testPair{hundredD, thirtyD}: expectedPair{0, zeroD},
 
-		// $0 fits into $10: 0 times with $0 remainder
+		// $0 fits into $10: 0 times at $0
 		testPair{zeroD, tenD}: expectedPair{0, zeroD},
 
-		// $10 fits into $0: 0 times with $10 remainder
-		testPair{tenD, zeroD}: expectedPair{0, tenD},
+		// $10 fits into $0: 0 times at $0
+		testPair{tenD, zeroD}: expectedPair{0, zeroD},
 
-		// $3.33 fits into $10: 3 times with $0.01 remainder
-		testPair{Currency{333}, tenD}: expectedPair{3, Currency{1}},
+		// $10 fits into $10: 1 time at $10
+		testPair{tenD, tenD}: expectedPair{1, tenD},
 	}
 
 	for tp, ep := range tests {
